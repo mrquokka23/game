@@ -1,0 +1,46 @@
+        if steeringInput == 0:
+            self.steerAngle = 0
+
+        if steeringInput < 0:
+            if self.steeringTstampL == 0:
+                self.steeringTstampL = deltaT
+                self.startSteerAngle = self.steerAngle
+            if self.startSteerAngle - (self.steeringSpeed * (deltaT - self.steeringTstampL)) < -0.785398 * abs(steeringInput):
+                self.startSteerAngle = -0.785398 * abs(steeringInput)
+            else:
+                self.steerAngle = self.startSteerAngle - (self.steeringSpeed * (deltaT - self.steeringTstampL))
+        if self.steeringTstampL != 0 and steeringInput >= 0:
+            self.steeringTstampL = 0
+
+        if steeringInput > 0:
+            if self.steeringTstampR == 0:
+                self.steeringTstampR = deltaT
+                self.startSteerAngle = self.steerAngle
+            if self.startSteerAngle + (self.steeringSpeed * (deltaT - self.steeringTstampR)) > 0.785398 * abs(steeringInput):
+                self.steerAngle = 0.785398 * abs(steeringInput)
+            else:
+                self.steerAngle = self.startSteerAngle + (self.steeringSpeed * (deltaT - self.steeringTstampR))
+        if self.steeringTstampR != 0 and steeringInput <= 0:
+            self.steeringTstampR = 0
+
+        if steeringInput == 0:
+            if self.steerbackTstamp == 0:
+                self.steerbackTstamp = deltaT
+                self.startSteerAngle = self.steerAngle
+
+            if self.startSteerAngle > 0:
+                if self.startSteerAngle - (self.steeringSpeed * (deltaT - self.steerbackTstamp)) < 0:
+                    self.steeringAngle = 0
+                    self.steerbackTstamp = 0
+                else:
+                    self.steerAngle = self.startSteerAngle - (self.steeringSpeed * (deltaT - self.steerbackTstamp))
+            elif self.steeringAngle < 0:
+                if self.startSteerAngle + (self.steeringSpeed * (deltaT - self.steerbackTstamp)) < 0:
+                    self.steeringAngle = 0
+                    self.steerbackTstamp = 0
+                else:
+                    self.steerAngle = self.startSteerAngle + (self.steeringSpeed * (deltaT - self.steerbackTstamp))
+            if (self.steerAngle == 0) or (
+                    steeringInput > 0) or (
+                    steeringInput < 0):
+                self.steerbackTstamp = 0
