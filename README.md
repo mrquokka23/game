@@ -1,5 +1,5 @@
 # game
-This is a self playing game
+This is a self playing game.
 It trains the cars to go around the track using NEAT (neuroevolution of augmenting topologies).
 To change the characteristics of the neural network and evolution you can change the config file.
 Best genome of a training session is saved in nets folder and can be replayed using the main menu.
