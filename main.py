@@ -37,7 +37,10 @@ def run(config_path, noOfLoops, noOfGenerations, resolution):
 
 
     winner = p.run(main,noOfGenerations)
-    with open("nets/winner2.pkl", "wb") as f:
+    filename = "winner.pkl"
+    while os.path.exists("nets/" + filename):
+        filename = "winner" + str(random.randint(0, 100)) + ".pkl"
+    with open("nets/" + filename, "wb") as f:
         pickle.dump(winner, f)
         f.close()
 
