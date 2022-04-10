@@ -3,7 +3,9 @@ import math
 import numpy
 
 class Car(pygame.sprite.Sprite):
-    def __init__(self, img, xpos, ypos):
+    def __init__(self, img, pos, resolution):
+        xpos = pos[0]
+        ypos = pos[1]
         pygame.sprite.Sprite.__init__(self)
         self.lastPosition = (0,0)
         self.position = (xpos, ypos)
@@ -12,11 +14,22 @@ class Car(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.velocity = 0  # pixels per loop
         self.lastVelocity = 0  # pixels per loop
-        self.acceleration = 0.01  # pixels per loop suared
-        self.deceleration = 0.005
-        self.brakingforce = 0.02  # pixels per loop suared(negative acceleration)
-        self.steeringSpeed = 0.002  # pixels per loop
-        self.maxSpeed = 4  # pixels per loop
+        if resolution == (1920, 1080):
+            self.acceleration = 0.01  # pixels per loop suared
+            self.deceleration = 0.005  # pixels per loop suared
+            self.brakingforce = 0.02  # pixels per loop suared(negative acceleration)
+            self.steeringSpeed = 0.002  # pixels per loop
+            self.maxSpeed = 4  # pixels per loop
+        elif resolution == (960, 540):
+            self.acceleration = 0.005  # pixels per loop suared
+            self.deceleration = 0.0025  # pixels per loop suared
+            self.brakingforce = 0.01  # pixels per loop suared(negative acceleration)
+            self.steeringSpeed = 0.001  # pixels per loop
+            self.maxSpeed = 2  # pixels per loop
+
+
+
+
         self.steeringAngle = 0  # percent (positive is left and negative is right)
         self.maxTurningDegrees = 45  # degrees
         self.angle = 0  # degrees (0 degrees = nose pointing east)
@@ -58,17 +71,23 @@ class Car(pygame.sprite.Sprite):
 
         # self.forwardLine = pygame.draw.line(screen,(255,0,0),self.rect.center,(math.cos(math.radians(self.carHeading))*400,math.sin(math.radians(self.carHeading))*400),1)
 
-    def checkRadars(self, radars, bgimg):
+    def checkRadars(self, radars, bgimg, resolution):
         i = 0
         for radar in radars:
             pos, dist, angle = radar
             len = 0
             x = int(self.rect.center[0] + math.cos(2 * math.pi + (self.carHeading + angle)) * len)
             y = int(self.rect.center[1] + math.sin(2 * math.pi + (self.carHeading + angle)) * len)
-            while not bgimg.get_at((x, y)) == (255, 255, 255) and len < 400:
-                len += 1
-                x = int(self.rect.center[0] + math.cos(2 * math.pi + (self.carHeading + angle)) * len)
-                y = int(self.rect.center[1] + math.sin(2 * math.pi + (self.carHeading + angle)) * len)
+            if resolution == (1920, 1080):
+                while not bgimg.get_at((x, y)) == (255, 255, 255) and len < 400:
+                    len += 1
+                    x = int(self.rect.center[0] + math.cos(2 * math.pi + (self.carHeading + angle)) * len)
+                    y = int(self.rect.center[1] + math.sin(2 * math.pi + (self.carHeading + angle)) * len)
+            elif resolution == (960, 540):
+                while not bgimg.get_at((x, y)) == (255, 255, 255) and len < 200:
+                    len += 1
+                    x = int(self.rect.center[0] + math.cos(2 * math.pi + (self.carHeading + angle)) * len)
+                    y = int(self.rect.center[1] + math.sin(2 * math.pi + (self.carHeading + angle)) * len)
 
             dist = math.sqrt(math.pow(x - self.rect.center[0], 2) + math.pow(y - self.rect.center[1], 2))
             self.radars[i] = ([(x, y), dist, angle])
@@ -84,7 +103,7 @@ class Car(pygame.sprite.Sprite):
     #def checkpoints(self, screen):
 
 
-    def update(self, deltaT, screen, bgimg, steeringInput, speedTarget, accelerationInput, draw):
+    def update(self, deltaT, screen, bgimg, steeringInput, speedTarget, accelerationInput, draw, resolution):
 
         pygame.sprite.Sprite.update(self)
 
@@ -172,7 +191,7 @@ class Car(pygame.sprite.Sprite):
         self.rect = self.rotImage.get_rect()
         self.rect.center = self.position
         self.mask = pygame.mask.from_surface(self.rotImage)
-        self.checkRadars(self.radars, bgimg)
+        self.checkRadars(self.radars, bgimg, resolution)
         self.distances = []
         for distance in self.radars:
             position, dist, angle = distance
